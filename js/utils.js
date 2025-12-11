@@ -11,17 +11,21 @@ function determineWiner({player, enemy, timerId}){
     document.querySelector("#displayText").style.display = 'flex'
     if (player.health == enemy.health){
         document.querySelector("#displayText").innerHTML = 'Draw'
+        player.switchSprite('death')
+        enemy.switchSprite('death')
     }
     else if (player.health > enemy.health){
         document.querySelector("#displayText").innerHTML = 'Player 1 wins'
+        enemy.switchSprite('death')
     }
     else if (enemy.health > player.health){
         document.querySelector("#displayText").innerHTML = 'Player 2 wins'
+        player.switchSprite('death')
     }
 }
 
 
-let timer = 10
+let timer = 30
 let timerId
 function decreaseTimer(){
     if (timer > 0){

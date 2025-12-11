@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 32px;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+            image-rendering: pixelated;
         }
     </style>
 </head>
@@ -10,17 +16,17 @@
     <div style="position: relative; display: inline-block;">
         <div style="position: absolute; display: flex; width: 100%; align-items: center; padding: 20px;">
             <!-- player health -->
-            <div style="position: relative; height: 30px; width: 100%; display: flex; justify-content: flex-end;">
-                <div style="background-color: yellow; height: 30px; width: 100%;"></div>
-                <div id="playerHealth" style="position: absolute; background: blue; top: 0; right: 0; bottom: 0; width: 100%;"></div>
+            <div style="position: relative; width: 100%; display: flex; justify-content: flex-end; border: 4px solid black;">
+                <div style="background-color: #3E225C; height: 30px; width: 100%;"></div>
+                <div id="playerHealth" style="position: absolute; background: #FFC7F7; top: 0; right: 0; bottom: 0; width: 100%;"></div>
             </div>
             <!-- timer -->
-            <div id="timer" style="background-color: red; width: 100px; height: 100px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+            <div id="timer" style="background-color: #BA7AD2; width: 80px; height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
             > 10 </div>
             <!-- enemy health -->
-            <div style="position: relative; height: 30px; width: 100%;">
-                <div style="background-color: yellow; height: 30px;"></div>
-                <div id="enemyHealth" style="position: absolute; background: blue; top: 0; right: 0; left: 0; bottom: 0;"></div>
+            <div style="position: relative; width: 100%; border: 4px solid black;">
+                <div style="background-color: #3E225C; height: 30px;"></div>
+                <div id="enemyHealth" style="position: absolute; background: #FFC7F7; top: 0; right: 0; left: 0; bottom: 0;"></div>
             </div>
            
             <div></div>
