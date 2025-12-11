@@ -23,8 +23,8 @@ const background = new Sprite({
 
 const player = new Fighter({
     position:{
-        x:0,
-        y:0
+        x:100,
+        y:380
     },
     velocity: {
         x:0,
@@ -83,8 +83,8 @@ const player = new Fighter({
 
 const enemy = new Fighter({
     position:{
-        x:400,
-        y:100
+        x:824,
+        y:380
     },
     velocity: {
         x:0,
@@ -99,7 +99,7 @@ const enemy = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 36,
+        x: 40,
         y: 0
     },
 
@@ -304,4 +304,3 @@ window.addEventListener('keyup', (event)=>{
             break
     }
 })
-
