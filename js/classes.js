@@ -57,7 +57,8 @@ class Fighter extends Sprite{
         framesMax = 1,
         offset = {x: 0, y: 0},
         sprites,
-        attackBox = {offset: {}, width: undefined, height: undefined}
+        attackBox = {offset: {}, width: undefined, height: undefined},
+        sounds = {attack: null, hit: null, jump: null, dash: null}
     }){
         super({
             position,
@@ -93,6 +94,20 @@ class Fighter extends Sprite{
             sprites[sprite].image = new Image()
             sprites[sprite].image.src = sprites[sprite].imageSrc
         }
+
+        this.sounds = {
+            attack: sounds.attack ? new Audio(sounds.attack) : null,
+            hit: sounds.hit ? new Audio(sounds.hit) : null,
+            jump: sounds.jump ? new Audio(sounds.jump) : null,
+            dash: sounds.dash ? new Audio(sounds.dash) : null
+        }
+        
+    }
+
+    drawCollisions(){
+        c.fillStyle = this.color
+        c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
     update(){
@@ -102,11 +117,6 @@ class Fighter extends Sprite{
 
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y
-
-        //draw collisions
-        // c.fillStyle = this.color
-        // c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
-        // c.fillRect(this.position.x, this.position.y, this.width, this.height)
         
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
@@ -122,6 +132,13 @@ class Fighter extends Sprite{
     attack(){
         this.switchSprite('attack')
         this.isAttacking = true
+
+        if (this.sounds.attack) {
+            this.sounds.attack.currentTime = 0
+            this.sounds.attack.volume = 0.4
+            this.sounds.attack.play()
+        }
+
         setTimeout(() => {
             this.isAttacking = false
         }, 500)
@@ -129,6 +146,13 @@ class Fighter extends Sprite{
 
     takeHit(){
         this.health -= 20
+
+        if (this.sounds.hit) {
+            this.sounds.hit.currentTime = 0
+            this.sounds.hit.volume = 0.8
+            this.sounds.hit.play()
+        }
+    
         if (this.health <= 0){
             this.switchSprite('death')
         }

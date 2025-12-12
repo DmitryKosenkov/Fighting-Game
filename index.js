@@ -76,6 +76,12 @@ const player = new Fighter({
         width: 32,
         height: 128
 
+    },
+    sounds:{
+        attack: './sounds/player/attack.wav',
+        hit: './sounds/player/hit.wav',
+        jump: './sounds/player/jump.wav',
+        dash: './sounds/player/dash.wav'
     }
 
 })
@@ -137,6 +143,12 @@ const enemy = new Fighter({
         width: 64,
         height: 72
 
+    },
+    sounds:{
+        attack: './sounds/enemy/attack.wav',
+        hit: './sounds/enemy/hit.wav',
+        jump: './sounds/enemy/jump.wav',
+        dash: './sounds/enemy/dash.wav'
     }
 
 })
@@ -250,14 +262,29 @@ window.addEventListener('keydown', (event)=>{
             case 'd':
                 keys.d.pressed = true
                 player.lastKey = 'd'
+                if (player.sounds.dash) {
+                    player.sounds.dash.currentTime = 0
+                    player.sounds.dash.volume = 0.6
+                    player.sounds.dash.play()
+                }
                 break
             case 'a':
                 keys.a.pressed = true
                 player.lastKey = 'a'
+                if (player.sounds.dash) {
+                    player.sounds.dash.currentTime = 0
+                    player.sounds.dash.volume = 0.5
+                    player.sounds.dash.play()
+                }
                 break
             case 'w':
                 if (player.position.y == 388)
                     player.velocity.y = -15
+                    if (player.sounds.jump) {
+                        player.sounds.jump.currentTime = 0
+                        player.sounds.jump.volume = 0.5
+                        player.sounds.jump.play()
+                    }
                 break
             case ' ':
                 player.attack()
@@ -270,14 +297,29 @@ window.addEventListener('keydown', (event)=>{
             case 'ArrowRight':
                 keys.ArrowRight.pressed = true
                 enemy.lastKey = 'ArrowRight'
+                if (enemy.sounds.dash) {
+                    enemy.sounds.dash.currentTime = 0
+                    enemy.sounds.dash.volume = 0.5
+                    enemy.sounds.dash.play()
+                }
                 break
             case 'ArrowLeft':
                 keys.ArrowLeft.pressed = true
                 enemy.lastKey = 'ArrowLeft'
+                if (enemy.sounds.dash) {
+                    enemy.sounds.dash.currentTime = 0
+                    enemy.sounds.dash.volume = 0.5
+                    enemy.sounds.dash.play()
+                }
                 break
             case 'ArrowUp':
                 if (enemy.position.y == 388)
                     enemy.velocity.y = -15
+                    if (enemy.sounds.jump) {
+                        enemy.sounds.jump.currentTime = 0
+                        enemy.sounds.jump.volume = 0.6
+                        enemy.sounds.jump.play()
+                    }
                 break
             case 'ArrowDown':
                 enemy.attack()
