@@ -1,75 +1,30 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
+
 canvas.width = 1024
 canvas.height = 576
 
 c.fillRect(0, 0, canvas.width, canvas.height)
+c.imageSmoothingEnabled = false;
 
-const gravity = 0.4
+const gravity = 0.5
+const speed = 10
+const flor = 60
 
-class Sprite{
-    constructor({position, velocity, color = 'red', offset}){
-        this.position = position
-        this.velocity = velocity
-        this.height = 100
-        this.width = 50
-        this.lastKey
-        this.attackBox = {
-            position:{
-                x: this.position.x,
-                y: this.position.y
-            },
-            offset,
-            width: 100,
-            height: 40
-        }
-        this.color = color
-        this.isAttacking
-        this.health = 100
-    }
-
-    draw(){
-        c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
-    }
-
-    update(){
-        this.draw()
-
-        this.attackBox.position.x = this.position.x + this.attackBox.offset.x
-        this.attackBox.position.y = this.position.y
-        
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
-
-        // attack box
-        if (this.isAttacking){
-            c.fillStyle = 'green'
-            c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
-        }
-        
-
-        if (this.position.y + this.height + this.velocity.y >= canvas.height){
-            this.velocity.y = 0
-        }
-        else{
-            this.velocity.y += gravity
-        }
-    }
-
-    attack(){
-        this.isAttacking = true
-        setTimeout(() => {
-            this.isAttacking = false
-        }, 100)
-    }
-}
-
-const player = new Sprite({
+const background = new Sprite({
     position:{
-        x:0,
-        y:0
+        x: 0,
+        y: 0
+    },
+    imageSrc: './img/back/background3.png',
+    scale: 4
+})
+
+const player = new Fighter({
+    position:{
+        x:100,
+        y:380
     },
     velocity: {
         x:0,
@@ -78,15 +33,64 @@ const player = new Sprite({
     offset:{
         x:0,
         y:0
+    },
+    imageSrc: './img/red/red_idle.png',
+    framesMax: 8,
+    scale: 4,
+    offset: {
+        x: 16,
+        y: 0
+    },
+
+    sprites:{
+        idle: {
+            imageSrc: './img/red/red_idle.png',
+            framesMax: 8
+        },
+        run_foward: {
+            imageSrc: './img/red/red_fly_forward.png',
+            framesMax: 8
+        },
+        run_back: {
+            imageSrc: './img/red/red_fly_back.png',
+            framesMax: 8
+        },
+        jump: {
+            imageSrc: './img/red/red_jumpp.png',
+            framesMax: 8
+        },
+        attack: {
+            imageSrc: './img/red/red_attack.png',
+            framesMax: 8
+        },
+        death: {
+            imageSrc: './img/red/red_defeat.png',
+            framesMax: 8
+        }
+    },
+    attackBox:{
+        offset:{
+            x: 74,
+            y: 0
+        },
+        width: 32,
+        height: 128
+
+    },
+    sounds:{
+        attack: './sounds/player/attack.wav',
+        hit: './sounds/player/hit.wav',
+        jump: './sounds/player/jump.wav',
+        dash: './sounds/player/dash.wav'
     }
 
 })
 
 
-const enemy = new Sprite({
+const enemy = new Fighter({
     position:{
-        x:400,
-        y:100
+        x:824,
+        y:380
     },
     velocity: {
         x:0,
@@ -96,6 +100,55 @@ const enemy = new Sprite({
     offset:{
         x: -50,
         y: 0
+    },
+    imageSrc: './img/blue/blue_idle.png',
+    framesMax: 8,
+    scale: 4,
+    offset: {
+        x: 40,
+        y: 0
+    },
+
+    sprites:{
+        idle: {
+            imageSrc: './img/blue/blue_idle.png',
+            framesMax: 8
+        },
+        run_foward: {
+            imageSrc: './img/blue/blue_fly_forward.png',
+            framesMax: 8
+        },
+        run_back: {
+            imageSrc: './img/blue/blue_fly_back.png',
+            framesMax: 8
+        },
+        jump: {
+            imageSrc: './img/blue/blue_jump.png',
+            framesMax: 8
+        },
+        attack: {
+            imageSrc: './img/blue/blue_attack.png',
+            framesMax: 8
+        },
+        death: {
+            imageSrc: './img/blue/blue_defeat.png',
+            framesMax: 8
+        }
+    },
+    attackBox:{
+        offset:{
+            x: -42,
+            y: 32
+        },
+        width: 64,
+        height: 72
+
+    },
+    sounds:{
+        attack: './sounds/enemy/attack.wav',
+        hit: './sounds/enemy/hit.wav',
+        jump: './sounds/enemy/jump.wav',
+        dash: './sounds/enemy/dash.wav'
     }
 
 })
@@ -113,52 +166,17 @@ const keys = {
     ArrowLeft:{
         pressed: false
     },
-
 }
 
-function rectangualCollision({rectangle1, rectangle2}){
-    return(
-        rectangle1.attackBox.position.x + rectangle1.attackBox.width >= rectangle2.position.x &&
-        rectangle1.attackBox.position.x <= rectangle2.position.x + rectangle2.width &&
-        rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y &&
-        rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height)
-}
-
-function determineWiner({player, enemy, timerId}){
-    clearTimeout(timerId)
-    document.querySelector("#displayText").style.display = 'flex'
-    if (player.health == enemy.health){
-        document.querySelector("#displayText").innerHTML = 'Draw'
-    }
-    else if (player.health > enemy.health){
-        document.querySelector("#displayText").innerHTML = 'Player 1 wins'
-    }
-    else if (enemy.health > player.health){
-        document.querySelector("#displayText").innerHTML = 'Player 2 wins'
-    }
-}
-
-
-let timer = 10
-let timerId
-function decreaseTimer(){
-    if (timer > 0){
-        timerId = setTimeout(decreaseTimer, 1000)
-        timer--
-        document.querySelector("#timer").innerHTML = timer
-    }
-    if (timer == 0){
-   
-        determineWiner({player, enemy, timerId})
-    }
-    
-}
 decreaseTimer()
 
 function animate(){
     window.requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0 ,canvas.width, canvas.height)
+    background.update()
+    c.fillStyle = 'rgba(0, 0, 255, 0.03)'
+    c.fillRect(0, 0, canvas.width, canvas.height)
     player.update()
     enemy.update()
 
@@ -166,19 +184,34 @@ function animate(){
     enemy.velocity.x = 0
 
     // player movement
+    
     if (keys.a.pressed && player.lastKey == 'a'){
-        player.velocity.x = -5
+        player.velocity.x = -speed
+        player.switchSprite('run_back')
+    } else if(keys.d.pressed && player.lastKey == 'd'){
+        player.velocity.x = speed
+        player.switchSprite('run_forward')
+    } else {
+        player.switchSprite('idle')
     }
-    else if(keys.d.pressed && player.lastKey == 'd'){
-        player.velocity.x = 5
+
+    if (player.velocity.y < 0){
+        player.switchSprite('jump')
     }
 
     // enemy movement
     if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft'){
-        enemy.velocity.x = -5
+        enemy.velocity.x = -speed
+        enemy.switchSprite('run_forward')
+    } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight'){
+        enemy.velocity.x = speed
+        enemy.switchSprite('run_back')
+    } else {
+        enemy.switchSprite('idle')
     }
-    else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight'){
-        enemy.velocity.x = 5
+
+    if (enemy.velocity.y < 0){
+        enemy.switchSprite('jump')
     }
 
     // detect for collision
@@ -187,11 +220,15 @@ function animate(){
             rectangle1: player,
             rectangle2: enemy
         }) &&
-        player.isAttacking
+        player.isAttacking && player.framesCurrent == 4
         ){
             player.isAttacking = false
-            enemy.health -= 20
+            enemy.takeHit()
             document.querySelector('#enemyHealth').style.width = enemy.health + '%'
+    }
+
+    if (player.isAttacking && player.framesCurrent == 4){
+        player.isAttacking = false
     }
 
     if (
@@ -199,11 +236,15 @@ function animate(){
             rectangle1: enemy,
             rectangle2: player
         }) &&
-        enemy.isAttacking
+        enemy.isAttacking && enemy.framesCurrent == 4
         ){
             enemy.isAttacking = false
-            player.health -= 20
+            player.takeHit()
             document.querySelector('#playerHealth').style.width = player.health + '%'
+    }
+
+    if (enemy.isAttacking && enemy.framesCurrent == 4){
+        enemy.isAttacking = false
     }
 
     // endgame based on health
@@ -216,37 +257,76 @@ function animate(){
 animate()
 
 window.addEventListener('keydown', (event)=>{
-    switch(event.key){
-        case 'd':
-            keys.d.pressed = true
-            player.lastKey = 'd'
-            break
-        case 'a':
-            keys.a.pressed = true
-            player.lastKey = 'a'
-            break
-        case 'w':
-            player.velocity.y = -15
-            break
-        case ' ':
-            player.attack()
-            break
-
-        case 'ArrowRight':
-            keys.ArrowRight.pressed = true
-            enemy.lastKey = 'ArrowRight'
-            break
-        case 'ArrowLeft':
-            keys.ArrowLeft.pressed = true
-            enemy.lastKey = 'ArrowLeft'
-            break
-        case 'ArrowUp':
-            enemy.velocity.y = -15
-            break
-        case 'ArrowDown':
-            enemy.attack()
-            break
+    if (!player.isDead){
+        switch(event.key){
+            case 'd':
+                keys.d.pressed = true
+                player.lastKey = 'd'
+                if (player.sounds.dash) {
+                    player.sounds.dash.currentTime = 0
+                    player.sounds.dash.volume = 0.6
+                    player.sounds.dash.play()
+                }
+                break
+            case 'a':
+                keys.a.pressed = true
+                player.lastKey = 'a'
+                if (player.sounds.dash) {
+                    player.sounds.dash.currentTime = 0
+                    player.sounds.dash.volume = 0.5
+                    player.sounds.dash.play()
+                }
+                break
+            case 'w':
+                if (player.position.y == 388)
+                    player.velocity.y = -15
+                    if (player.sounds.jump) {
+                        player.sounds.jump.currentTime = 0
+                        player.sounds.jump.volume = 0.5
+                        player.sounds.jump.play()
+                    }
+                break
+            case ' ':
+                player.attack()
+                break
+        }
     }
+    
+    if (!enemy.isDead){
+        switch(event.key){
+            case 'ArrowRight':
+                keys.ArrowRight.pressed = true
+                enemy.lastKey = 'ArrowRight'
+                if (enemy.sounds.dash) {
+                    enemy.sounds.dash.currentTime = 0
+                    enemy.sounds.dash.volume = 0.5
+                    enemy.sounds.dash.play()
+                }
+                break
+            case 'ArrowLeft':
+                keys.ArrowLeft.pressed = true
+                enemy.lastKey = 'ArrowLeft'
+                if (enemy.sounds.dash) {
+                    enemy.sounds.dash.currentTime = 0
+                    enemy.sounds.dash.volume = 0.5
+                    enemy.sounds.dash.play()
+                }
+                break
+            case 'ArrowUp':
+                if (enemy.position.y == 388)
+                    enemy.velocity.y = -15
+                    if (enemy.sounds.jump) {
+                        enemy.sounds.jump.currentTime = 0
+                        enemy.sounds.jump.volume = 0.6
+                        enemy.sounds.jump.play()
+                    }
+                break
+            case 'ArrowDown':
+                enemy.attack()
+                break
+        }
+    }
+    
 })
 
 window.addEventListener('keyup', (event)=>{
@@ -266,4 +346,3 @@ window.addEventListener('keyup', (event)=>{
             break
     }
 })
-
