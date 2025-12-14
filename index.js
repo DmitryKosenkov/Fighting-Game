@@ -38,7 +38,7 @@ const player = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 16,
+        x: 60,
         y: 0
     },
 
@@ -105,7 +105,7 @@ const enemy = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 0,
+        x: 64,
         y: 0
     },
 
@@ -137,11 +137,11 @@ const enemy = new Fighter({
     },
     attackBox:{
         offset:{
-            x: -42,
+            x: -24,
             y: 32
         },
-        width: 64,
-        height: 72
+        width: 24,
+        height: 64
 
     },
     sounds:{
