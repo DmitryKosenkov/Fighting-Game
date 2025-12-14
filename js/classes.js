@@ -114,6 +114,8 @@ class Fighter extends Sprite{
         this.draw()
         if (!this.isDead)
             this.animateFrames()
+        
+        this.drawCollisions()
 
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y

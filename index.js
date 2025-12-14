@@ -44,27 +44,27 @@ const player = new Fighter({
 
     sprites:{
         idle: {
-            imageSrc: './img/red/red_idle.png',
+            imageSrc: './img/red/idle.png',
             framesMax: 8
         },
         run_foward: {
-            imageSrc: './img/red/red_fly_forward.png',
+            imageSrc: './img/red/forward.png',
             framesMax: 8
         },
         run_back: {
-            imageSrc: './img/red/red_fly_back.png',
+            imageSrc: './img/red/back.png',
             framesMax: 8
         },
         jump: {
-            imageSrc: './img/red/red_jumpp.png',
+            imageSrc: './img/red/jump.png',
             framesMax: 8
         },
         attack: {
-            imageSrc: './img/red/red_attack.png',
+            imageSrc: './img/red/attack.png',
             framesMax: 8
         },
         death: {
-            imageSrc: './img/red/red_defeat.png',
+            imageSrc: './img/red/defeat.png',
             framesMax: 8
         }
     },
@@ -105,33 +105,33 @@ const enemy = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 40,
+        x: 0,
         y: 0
     },
 
     sprites:{
         idle: {
-            imageSrc: './img/blue/blue_idle.png',
+            imageSrc: './img/blue/idle.png',
             framesMax: 8
         },
         run_foward: {
-            imageSrc: './img/blue/blue_fly_forward.png',
+            imageSrc: './img/blue/forward.png',
             framesMax: 8
         },
         run_back: {
-            imageSrc: './img/blue/blue_fly_back.png',
+            imageSrc: './img/blue/back.png',
             framesMax: 8
         },
         jump: {
-            imageSrc: './img/blue/blue_jump.png',
+            imageSrc: './img/blue/jump.png',
             framesMax: 8
         },
         attack: {
-            imageSrc: './img/blue/blue_attack.png',
+            imageSrc: './img/blue/attack.png',
             framesMax: 8
         },
         death: {
-            imageSrc: './img/blue/blue_defeat.png',
+            imageSrc: './img/blue/defeat.png',
             framesMax: 8
         }
     },
