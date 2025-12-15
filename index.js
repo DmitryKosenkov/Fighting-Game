@@ -200,10 +200,10 @@ function animate(){
 
     // player movement
     
-    if (keys.a.pressed && player.lastKey == 'a'){
+    if (keys.a.pressed && player.lastKey == 'a' && player.position.x > 0){
         player.velocity.x = -speed
         player.switchSprite('run_back')
-    } else if(keys.d.pressed && player.lastKey == 'd'){
+    } else if(keys.d.pressed && player.lastKey == 'd' && player.position.x + player.width < canvas.width){
         player.velocity.x = speed
         player.switchSprite('run_forward')
     } else {
@@ -215,10 +215,10 @@ function animate(){
     }
 
     // enemy movement
-    if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft'){
+    if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft' && enemy.position.x > 0){
         enemy.velocity.x = -speed
         enemy.switchSprite('run_forward')
-    } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight'){
+    } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight' && enemy.position.x + enemy.width < canvas.width){
         enemy.velocity.x = speed
         enemy.switchSprite('run_back')
     } else {
