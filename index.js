@@ -38,42 +38,42 @@ const player = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 16,
+        x: 60,
         y: 0
     },
 
     sprites:{
         idle: {
-            imageSrc: './img/red/red_idle.png',
+            imageSrc: './img/red/idle.png',
             framesMax: 8
         },
         run_foward: {
-            imageSrc: './img/red/red_fly_forward.png',
+            imageSrc: './img/red/forward.png',
             framesMax: 8
         },
         run_back: {
-            imageSrc: './img/red/red_fly_back.png',
+            imageSrc: './img/red/back.png',
             framesMax: 8
         },
         jump: {
-            imageSrc: './img/red/red_jumpp.png',
+            imageSrc: './img/red/jump.png',
             framesMax: 8
         },
         attack: {
-            imageSrc: './img/red/red_attack.png',
+            imageSrc: './img/red/attack.png',
             framesMax: 8
         },
         death: {
-            imageSrc: './img/red/red_defeat.png',
+            imageSrc: './img/red/defeat.png',
             framesMax: 8
         }
     },
     attackBox:{
         offset:{
-            x: 74,
+            x: 64,
             y: 0
         },
-        width: 32,
+        width: 40,
         height: 128
 
     },
@@ -82,7 +82,8 @@ const player = new Fighter({
         hit: './sounds/player/hit.wav',
         jump: './sounds/player/jump.wav',
         dash: './sounds/player/dash.wav'
-    }
+    },
+    defaultFacing: 'right'
 
 })
 
@@ -105,43 +106,43 @@ const enemy = new Fighter({
     framesMax: 8,
     scale: 4,
     offset: {
-        x: 40,
+        x: 64,
         y: 0
     },
 
     sprites:{
         idle: {
-            imageSrc: './img/blue/blue_idle.png',
+            imageSrc: './img/blue/idle.png',
             framesMax: 8
         },
         run_foward: {
-            imageSrc: './img/blue/blue_fly_forward.png',
+            imageSrc: './img/blue/forward.png',
             framesMax: 8
         },
         run_back: {
-            imageSrc: './img/blue/blue_fly_back.png',
+            imageSrc: './img/blue/back.png',
             framesMax: 8
         },
         jump: {
-            imageSrc: './img/blue/blue_jump.png',
+            imageSrc: './img/blue/jump.png',
             framesMax: 8
         },
         attack: {
-            imageSrc: './img/blue/blue_attack.png',
+            imageSrc: './img/blue/attack.png',
             framesMax: 8
         },
         death: {
-            imageSrc: './img/blue/blue_defeat.png',
+            imageSrc: './img/blue/defeat.png',
             framesMax: 8
         }
     },
     attackBox:{
         offset:{
-            x: -42,
+            x: 64,
             y: 32
         },
-        width: 64,
-        height: 72
+        width: 24,
+        height: 64
 
     },
     sounds:{
@@ -149,7 +150,8 @@ const enemy = new Fighter({
         hit: './sounds/enemy/hit.wav',
         jump: './sounds/enemy/jump.wav',
         dash: './sounds/enemy/dash.wav'
-    }
+    },
+    defaultFacing: 'left'
 
 })
 
@@ -168,7 +170,7 @@ const keys = {
     },
 }
 
-decreaseTimer()
+// decreaseTimer()
 
 function animate(){
     window.requestAnimationFrame(animate)
@@ -180,39 +182,54 @@ function animate(){
     player.update()
     enemy.update()
 
+    if (player.position.x < enemy.position.x) {
+        player.facing = 'right'
+        enemy.facing = 'left'
+
+        player.attackBox.offset.x = 64
+        enemy.attackBox.offset.x = -24
+    } else {
+        player.facing = 'left'
+        enemy.facing = 'right'
+        player.attackBox.offset.x = -32
+        enemy.attackBox.offset.x = 64
+    }
+
     player.velocity.x = 0
     enemy.velocity.x = 0
 
-    // player movement
-    
-    if (keys.a.pressed && player.lastKey == 'a'){
-        player.velocity.x = -speed
-        player.switchSprite('run_back')
-    } else if(keys.d.pressed && player.lastKey == 'd'){
-        player.velocity.x = speed
-        player.switchSprite('run_forward')
-    } else {
-        player.switchSprite('idle')
+    if (gameState === GAME_STATE.PLAYING){
+            // player movement
+        if (keys.a.pressed && player.lastKey == 'a' && player.position.x > 0){
+            player.velocity.x = -speed
+            player.switchSprite('run_back')
+        } else if(keys.d.pressed && player.lastKey == 'd' && player.position.x + player.width < canvas.width){
+            player.velocity.x = speed
+            player.switchSprite('run_forward')
+        } else {
+            player.switchSprite('idle')
+        }
+
+        if (player.velocity.y < 0){
+            player.switchSprite('jump')
+        }
+
+        // enemy movement
+        if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft' && enemy.position.x > 0){
+            enemy.velocity.x = -speed
+            enemy.switchSprite('run_forward')
+        } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight' && enemy.position.x + enemy.width < canvas.width){
+            enemy.velocity.x = speed
+            enemy.switchSprite('run_back')
+        } else {
+            enemy.switchSprite('idle')
+        }
+
+        if (enemy.velocity.y < 0){
+            enemy.switchSprite('jump')
+        }
     }
 
-    if (player.velocity.y < 0){
-        player.switchSprite('jump')
-    }
-
-    // enemy movement
-    if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft'){
-        enemy.velocity.x = -speed
-        enemy.switchSprite('run_forward')
-    } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight'){
-        enemy.velocity.x = speed
-        enemy.switchSprite('run_back')
-    } else {
-        enemy.switchSprite('idle')
-    }
-
-    if (enemy.velocity.y < 0){
-        enemy.switchSprite('jump')
-    }
 
     // detect for collision
     if (
@@ -248,16 +265,72 @@ function animate(){
     }
 
     // endgame based on health
-    if (enemy.health <= 0 || player.health <= 0){
-        determineWiner({player, enemy, timerId})
+    if (
+        gameState === GAME_STATE.PLAYING &&
+        (enemy.health <= 0 || player.health <= 0)
+    ) {
+        determineWiner({ player, enemy, timerId })
     }
+    
 
 }
 
+
 animate()
 
+function startGame() {
+    gameState = GAME_STATE.PLAYING
+    document.querySelector('#UI').style.display = 'flex'
+    decreaseTimer()
+}
+
+function resetGame() {
+    gameState = GAME_STATE.IDLE
+    countdown = 3
+    timer = 30
+    document.querySelector('#timer').innerHTML = timer
+
+    // health
+    player.health = 100
+    enemy.health = 100
+    document.querySelector('#playerHealth').style.width = '100%'
+    document.querySelector('#enemyHealth').style.width = '100%'
+
+    // positions
+    player.position.x = 100
+    player.position.y = 380
+    enemy.position.x = 824
+    enemy.position.y = 380
+
+    // velocity
+    player.velocity.x = 0
+    player.velocity.y = 0
+    enemy.velocity.x = 0
+    enemy.velocity.y = 0
+
+    // states
+    player.isDead = false
+    enemy.isDead = false
+    player.isAttacking = false
+    enemy.isAttacking = false
+    player.roundOver = false
+    enemy.roundOver = false
+    player.framesCurrent = 0
+    enemy.framesCurrent = 0
+    player.switchSprite('idle')
+    enemy.switchSprite('idle')
+
+    const displayText = document.querySelector('#displayText')
+    displayText.style.display = 'flex'
+    displayText.innerText = 'PRESS ENTER TO START'
+}
+
+
+
+
+
 window.addEventListener('keydown', (event)=>{
-    if (!player.isDead){
+    if (!player.isDead && gameState === GAME_STATE.PLAYING){
         switch(event.key){
             case 'd':
                 keys.d.pressed = true
@@ -292,7 +365,7 @@ window.addEventListener('keydown', (event)=>{
         }
     }
     
-    if (!enemy.isDead){
+    if (!enemy.isDead && gameState === GAME_STATE.PLAYING){
         switch(event.key){
             case 'ArrowRight':
                 keys.ArrowRight.pressed = true
@@ -326,6 +399,24 @@ window.addEventListener('keydown', (event)=>{
                 break
         }
     }
+    switch(event.key){
+        case 'p':
+            player.showCollisions = !player.showCollisions
+            enemy.showCollisions = !enemy.showCollisions
+            break
+    }
+
+    if (gameState === GAME_STATE.OVER && event.code === 'Enter') {
+        resetGame()
+        return
+    }
+
+    if (gameState === GAME_STATE.IDLE && event.code === 'Enter') {
+        startCountdown()
+        return
+    }
+
+    if (gameState !== GAME_STATE.PLAYING) return
     
 })
 
