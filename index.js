@@ -70,10 +70,10 @@ const player = new Fighter({
     },
     attackBox:{
         offset:{
-            x: 74,
+            x: 64,
             y: 0
         },
-        width: 32,
+        width: 40,
         height: 128
 
     },
@@ -82,7 +82,8 @@ const player = new Fighter({
         hit: './sounds/player/hit.wav',
         jump: './sounds/player/jump.wav',
         dash: './sounds/player/dash.wav'
-    }
+    },
+    defaultFacing: 'right'
 
 })
 
@@ -137,7 +138,7 @@ const enemy = new Fighter({
     },
     attackBox:{
         offset:{
-            x: -24,
+            x: 64,
             y: 32
         },
         width: 24,
@@ -149,7 +150,8 @@ const enemy = new Fighter({
         hit: './sounds/enemy/hit.wav',
         jump: './sounds/enemy/jump.wav',
         dash: './sounds/enemy/dash.wav'
-    }
+    },
+    defaultFacing: 'left'
 
 })
 
@@ -179,6 +181,19 @@ function animate(){
     c.fillRect(0, 0, canvas.width, canvas.height)
     player.update()
     enemy.update()
+
+    if (player.position.x < enemy.position.x) {
+        player.facing = 'right'
+        enemy.facing = 'left'
+
+        player.attackBox.offset.x = 64
+        enemy.attackBox.offset.x = -24
+    } else {
+        player.facing = 'left'
+        enemy.facing = 'right'
+        player.attackBox.offset.x = -32
+        enemy.attackBox.offset.x = 64
+    }
 
     player.velocity.x = 0
     enemy.velocity.x = 0
@@ -325,6 +340,12 @@ window.addEventListener('keydown', (event)=>{
                 enemy.attack()
                 break
         }
+    }
+    switch(event.key){
+        case 'p':
+            player.showCollisions = !player.showCollisions
+            enemy.showCollisions = !enemy.showCollisions
+            break
     }
     
 })

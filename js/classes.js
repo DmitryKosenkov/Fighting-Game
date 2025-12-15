@@ -14,18 +14,43 @@ class Sprite{
     }
 
     draw(){
-        c.drawImage(
-            this.image,
-            this.framesCurrent * (this.image.width / this.framesMax) ,
-            0,
-            this.image.width / this.framesMax,
-            this.image.height,
-            this.position.x - this.offset.x,
-            this.position.y - this.offset.y,
-            (this.image.width / this.framesMax) * this.scale,
-            this.image.height * this.scale
+        c.save()
+    
+        const shouldFlip =
+            (this.facing === 'left' && this.defaultFacing === 'right') ||
+            (this.facing === 'right' && this.defaultFacing === 'left')
+    
+        if (shouldFlip) {
+            c.scale(-1, 1)
+            c.drawImage(
+                this.image,
+                this.framesCurrent * (this.image.width / this.framesMax),
+                0,
+                this.image.width / this.framesMax,
+                this.image.height,
+                -(this.position.x - this.offset.x) - (this.image.width / this.framesMax) * this.scale,
+                this.position.y - this.offset.y,
+                (this.image.width / this.framesMax) * this.scale,
+                this.image.height * this.scale
             )
+        } else {
+            c.drawImage(
+                this.image,
+                this.framesCurrent * (this.image.width / this.framesMax),
+                0,
+                this.image.width / this.framesMax,
+                this.image.height,
+                this.position.x - this.offset.x,
+                this.position.y - this.offset.y,
+                (this.image.width / this.framesMax) * this.scale,
+                this.image.height * this.scale
+            )
+        }
+    
+        c.restore()
     }
+    
+    
 
     animateFrames(){
         this.framesElapsed++
@@ -58,7 +83,8 @@ class Fighter extends Sprite{
         offset = {x: 0, y: 0},
         sprites,
         attackBox = {offset: {}, width: undefined, height: undefined},
-        sounds = {attack: null, hit: null, jump: null, dash: null}
+        sounds = {attack: null, hit: null, jump: null, dash: null},
+        defaultFacing = 'right'
     }){
         super({
             position,
@@ -89,6 +115,9 @@ class Fighter extends Sprite{
         this.framesHold = 3
         this.sprites = sprites
         this.isDead = false
+        this.facing = 'right'
+        this.defaultFacing = defaultFacing
+        this.showCollisions = false
 
         for(const sprite in sprites){
             sprites[sprite].image = new Image()
@@ -105,10 +134,12 @@ class Fighter extends Sprite{
     }
 
     drawCollisions(){
+        if (!this.showCollisions) return
         c.fillStyle = this.color
         c.globalAlpha = 0.5
         c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
+        c.globalAlpha = 1
     }
 
     update(){
