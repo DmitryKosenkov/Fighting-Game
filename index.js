@@ -142,7 +142,7 @@ const enemy = new Fighter({
             y: 32
         },
         width: 24,
-        height: 64
+        height: 72
 
     },
     sounds:{
@@ -199,7 +199,7 @@ function animate(){
     enemy.velocity.x = 0
 
     if (gameState === GAME_STATE.PLAYING){
-            // player movement
+        // player movement
         if (keys.a.pressed && player.lastKey == 'a' && player.position.x > 0){
             player.velocity.x = -speed
             player.switchSprite('run_back')
