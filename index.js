@@ -170,7 +170,7 @@ const keys = {
     },
 }
 
-decreaseTimer()
+// decreaseTimer()
 
 function animate(){
     window.requestAnimationFrame(animate)
@@ -198,36 +198,38 @@ function animate(){
     player.velocity.x = 0
     enemy.velocity.x = 0
 
-    // player movement
-    
-    if (keys.a.pressed && player.lastKey == 'a' && player.position.x > 0){
-        player.velocity.x = -speed
-        player.switchSprite('run_back')
-    } else if(keys.d.pressed && player.lastKey == 'd' && player.position.x + player.width < canvas.width){
-        player.velocity.x = speed
-        player.switchSprite('run_forward')
-    } else {
-        player.switchSprite('idle')
+    if (gameState === GAME_STATE.PLAYING){
+            // player movement
+        if (keys.a.pressed && player.lastKey == 'a' && player.position.x > 0){
+            player.velocity.x = -speed
+            player.switchSprite('run_back')
+        } else if(keys.d.pressed && player.lastKey == 'd' && player.position.x + player.width < canvas.width){
+            player.velocity.x = speed
+            player.switchSprite('run_forward')
+        } else {
+            player.switchSprite('idle')
+        }
+
+        if (player.velocity.y < 0){
+            player.switchSprite('jump')
+        }
+
+        // enemy movement
+        if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft' && enemy.position.x > 0){
+            enemy.velocity.x = -speed
+            enemy.switchSprite('run_forward')
+        } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight' && enemy.position.x + enemy.width < canvas.width){
+            enemy.velocity.x = speed
+            enemy.switchSprite('run_back')
+        } else {
+            enemy.switchSprite('idle')
+        }
+
+        if (enemy.velocity.y < 0){
+            enemy.switchSprite('jump')
+        }
     }
 
-    if (player.velocity.y < 0){
-        player.switchSprite('jump')
-    }
-
-    // enemy movement
-    if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft' && enemy.position.x > 0){
-        enemy.velocity.x = -speed
-        enemy.switchSprite('run_forward')
-    } else if(keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight' && enemy.position.x + enemy.width < canvas.width){
-        enemy.velocity.x = speed
-        enemy.switchSprite('run_back')
-    } else {
-        enemy.switchSprite('idle')
-    }
-
-    if (enemy.velocity.y < 0){
-        enemy.switchSprite('jump')
-    }
 
     // detect for collision
     if (
@@ -263,16 +265,72 @@ function animate(){
     }
 
     // endgame based on health
-    if (enemy.health <= 0 || player.health <= 0){
-        determineWiner({player, enemy, timerId})
+    if (
+        gameState === GAME_STATE.PLAYING &&
+        (enemy.health <= 0 || player.health <= 0)
+    ) {
+        determineWiner({ player, enemy, timerId })
     }
+    
 
 }
 
+
 animate()
 
+function startGame() {
+    gameState = GAME_STATE.PLAYING
+    document.querySelector('#UI').style.display = 'flex'
+    decreaseTimer()
+}
+
+function resetGame() {
+    gameState = GAME_STATE.IDLE
+    countdown = 3
+    timer = 30
+    document.querySelector('#timer').innerHTML = timer
+
+    // health
+    player.health = 100
+    enemy.health = 100
+    document.querySelector('#playerHealth').style.width = '100%'
+    document.querySelector('#enemyHealth').style.width = '100%'
+
+    // positions
+    player.position.x = 100
+    player.position.y = 380
+    enemy.position.x = 824
+    enemy.position.y = 380
+
+    // velocity
+    player.velocity.x = 0
+    player.velocity.y = 0
+    enemy.velocity.x = 0
+    enemy.velocity.y = 0
+
+    // states
+    player.isDead = false
+    enemy.isDead = false
+    player.isAttacking = false
+    enemy.isAttacking = false
+    player.roundOver = false
+    enemy.roundOver = false
+    player.framesCurrent = 0
+    enemy.framesCurrent = 0
+    player.switchSprite('idle')
+    enemy.switchSprite('idle')
+
+    const displayText = document.querySelector('#displayText')
+    displayText.style.display = 'flex'
+    displayText.innerText = 'PRESS ENTER TO START'
+}
+
+
+
+
+
 window.addEventListener('keydown', (event)=>{
-    if (!player.isDead){
+    if (!player.isDead && gameState === GAME_STATE.PLAYING){
         switch(event.key){
             case 'd':
                 keys.d.pressed = true
@@ -307,7 +365,7 @@ window.addEventListener('keydown', (event)=>{
         }
     }
     
-    if (!enemy.isDead){
+    if (!enemy.isDead && gameState === GAME_STATE.PLAYING){
         switch(event.key){
             case 'ArrowRight':
                 keys.ArrowRight.pressed = true
@@ -347,6 +405,18 @@ window.addEventListener('keydown', (event)=>{
             enemy.showCollisions = !enemy.showCollisions
             break
     }
+
+    if (gameState === GAME_STATE.OVER && event.code === 'Enter') {
+        resetGame()
+        return
+    }
+
+    if (gameState === GAME_STATE.IDLE && event.code === 'Enter') {
+        startCountdown()
+        return
+    }
+
+    if (gameState !== GAME_STATE.PLAYING) return
     
 })
 

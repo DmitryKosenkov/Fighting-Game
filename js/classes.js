@@ -118,6 +118,7 @@ class Fighter extends Sprite{
         this.facing = 'right'
         this.defaultFacing = defaultFacing
         this.showCollisions = false
+        this.roundOver = false
 
         for(const sprite in sprites){
             sprites[sprite].image = new Image()
@@ -142,26 +143,42 @@ class Fighter extends Sprite{
         c.globalAlpha = 1
     }
 
-    update(){
+    update() {
         this.draw()
-        if (!this.isDead)
-            this.animateFrames()
-        
         this.drawCollisions()
-
+    
+        if (this.image === this.sprites.death.image) {
+            if (this.framesCurrent < this.sprites.death.framesMax - 1) {
+                this.animateFrames()
+            }
+            return
+        }
+    
+        if (this.roundOver) {
+            if (this.image !== this.sprites.idle.image) {
+                this.switchSprite('idle')
+            }
+            this.animateFrames()
+            return
+        }
+    
+        this.animateFrames()
+    
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y
-        
+    
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
-
-        if (this.position.y + this.height + this.velocity.y >= canvas.height - flor){
+    
+        if (this.position.y + this.height + this.velocity.y >= canvas.height - flor) {
             this.velocity.y = 0
-        }
-        else{
+        } else {
             this.velocity.y += gravity
         }
     }
+    
+    
+    
 
     attack(){
         this.switchSprite('attack')
@@ -192,49 +209,49 @@ class Fighter extends Sprite{
         }
     }
 
-    switchSprite(sprite){
-        if (this.image === this.sprites.death.image) {
-            if (this.framesCurrent === this.sprites.death.framesMax - 1)
-                this.isDead = true
-            return}
+    switchSprite(sprite) {
+        if (this.isDead && this.image === this.sprites.death.image) return
+    
         if (this.image === this.sprites.attack.image && this.framesCurrent < this.sprites.attack.framesMax - 1) return
+    
         switch (sprite) {
             case 'idle':
-                if(this.image != this.sprites.idle.image){
+                if (this.image !== this.sprites.idle.image) {
                     this.image = this.sprites.idle.image
                     this.framesCurrent = 0
                 }
                 break
             case 'run_forward':
-                if (this.image != this.sprites.run_foward.image){
+                if (this.image !== this.sprites.run_foward.image) {
                     this.image = this.sprites.run_foward.image
                     this.framesCurrent = 0
                 }
                 break
             case 'run_back':
-                if (this.image = this.sprites.run_back.image){
+                if (this.image !== this.sprites.run_back.image) {
                     this.image = this.sprites.run_back.image
                     this.framesCurrent = 0
-                } 
+                }
                 break
             case 'jump':
-                if (this.image != this.sprites.jump.image){
+                if (this.image !== this.sprites.jump.image) {
                     this.image = this.sprites.jump.image
                     this.framesCurrent = 0
-                } 
+                }
                 break
             case 'attack':
-                if (this.image != this.sprites.attack.image){
+                if (this.image !== this.sprites.attack.image) {
                     this.image = this.sprites.attack.image
                     this.framesCurrent = 0
-                } 
+                }
                 break
             case 'death':
-                if (this.image != this.sprites.death.image){
+                if (this.image !== this.sprites.death.image) {
                     this.image = this.sprites.death.image
                     this.framesCurrent = 0
-                } 
+                }
                 break
         }
     }
+    
 }
