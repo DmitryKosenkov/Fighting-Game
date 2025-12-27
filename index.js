@@ -12,6 +12,8 @@ const gravity = 0.5
 const speed = 10
 const flor = 60
 
+let lastTime = 0
+
 const background = new Sprite({
     position:{
         x: 0,
@@ -170,17 +172,18 @@ const keys = {
     },
 }
 
-// decreaseTimer()
+function animate(time = 0){
+    const deltaTime = (time - lastTime) / 16.67
+    lastTime = time
 
-function animate(){
     window.requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0 ,canvas.width, canvas.height)
-    background.update()
+    background.update(deltaTime)
     c.fillStyle = 'rgba(0, 0, 255, 0.03)'
     c.fillRect(0, 0, canvas.width, canvas.height)
-    player.update()
-    enemy.update()
+    player.update(deltaTime)
+    enemy.update(deltaTime)
 
     if (player.position.x < enemy.position.x) {
         player.facing = 'right'
@@ -278,6 +281,7 @@ function animate(){
 
 animate()
 
+
 function startGame() {
     gameState = GAME_STATE.PLAYING
     document.querySelector('#UI').style.display = 'flex'
@@ -317,6 +321,8 @@ function resetGame() {
     enemy.roundOver = false
     player.framesCurrent = 0
     enemy.framesCurrent = 0
+    player.framesElapsed = 0
+    enemy.framesElapsed = 0
     player.switchSprite('idle')
     enemy.switchSprite('idle')
 
@@ -351,7 +357,7 @@ window.addEventListener('keydown', (event)=>{
                 }
                 break
             case 'w':
-                if (player.position.y == 388)
+                if (player.position.y >= 384)
                     player.velocity.y = -15
                     if (player.sounds.jump) {
                         player.sounds.jump.currentTime = 0
@@ -386,7 +392,7 @@ window.addEventListener('keydown', (event)=>{
                 }
                 break
             case 'ArrowUp':
-                if (enemy.position.y == 388)
+                if (enemy.position.y >= 384)
                     enemy.velocity.y = -15
                     if (enemy.sounds.jump) {
                         enemy.sounds.jump.currentTime = 0

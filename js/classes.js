@@ -19,6 +19,8 @@ class Sprite{
         const shouldFlip =
             (this.facing === 'left' && this.defaultFacing === 'right') ||
             (this.facing === 'right' && this.defaultFacing === 'left')
+        
+        if (this.image.width === 0) return
     
         if (shouldFlip) {
             c.scale(-1, 1)
@@ -52,21 +54,36 @@ class Sprite{
     
     
 
-    animateFrames(){
-        this.framesElapsed++
+    // animateFrames(deltaTime){
+    //     this.framesElapsed += deltaTime
         
-        if (this.framesElapsed % this.framesHold === 0){
-            if (this.framesCurrent < this.framesMax - 1){
+    //     if (this.framesElapsed % this.framesHold === 0){
+    //         if (this.framesCurrent < this.framesMax - 1){
+    //             this.framesCurrent++
+    //         } else {
+    //             this.framesCurrent = 0
+    //         }
+    //     }
+    // }
+
+    animateFrames(deltaTime) {
+        this.framesElapsed += deltaTime
+    
+        if (this.framesElapsed >= this.framesHold) {
+            this.framesElapsed = 0
+    
+            if (this.framesCurrent < this.framesMax - 1) {
                 this.framesCurrent++
             } else {
                 this.framesCurrent = 0
             }
         }
     }
+    
 
-    update(){
+    update(deltaTime){
         this.draw()
-        this.animateFrames()
+        this.animateFrames(deltaTime)
 
     }
 
@@ -143,13 +160,13 @@ class Fighter extends Sprite{
         c.globalAlpha = 1
     }
 
-    update() {
+    update(deltaTime) {
         this.draw()
         this.drawCollisions()
     
         if (this.image === this.sprites.death.image) {
             if (this.framesCurrent < this.sprites.death.framesMax - 1) {
-                this.animateFrames()
+                this.animateFrames(deltaTime)
             }
             return
         }
@@ -158,22 +175,22 @@ class Fighter extends Sprite{
             if (this.image !== this.sprites.idle.image) {
                 this.switchSprite('idle')
             }
-            this.animateFrames()
+            this.animateFrames(deltaTime)
             return
         }
     
-        this.animateFrames()
+        this.animateFrames(deltaTime)
     
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y
     
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
+        this.position.x += this.velocity.x * deltaTime
+        this.position.y += this.velocity.y * deltaTime
     
         if (this.position.y + this.height + this.velocity.y >= canvas.height - flor) {
             this.velocity.y = 0
         } else {
-            this.velocity.y += gravity
+            this.velocity.y += gravity * deltaTime
         }
     }
     
@@ -219,36 +236,42 @@ class Fighter extends Sprite{
                 if (this.image !== this.sprites.idle.image) {
                     this.image = this.sprites.idle.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
             case 'run_forward':
                 if (this.image !== this.sprites.run_foward.image) {
                     this.image = this.sprites.run_foward.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
             case 'run_back':
                 if (this.image !== this.sprites.run_back.image) {
                     this.image = this.sprites.run_back.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
             case 'jump':
                 if (this.image !== this.sprites.jump.image) {
                     this.image = this.sprites.jump.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
             case 'attack':
                 if (this.image !== this.sprites.attack.image) {
                     this.image = this.sprites.attack.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
             case 'death':
                 if (this.image !== this.sprites.death.image) {
                     this.image = this.sprites.death.image
                     this.framesCurrent = 0
+                    this.framesElapsed = 0
                 }
                 break
         }
